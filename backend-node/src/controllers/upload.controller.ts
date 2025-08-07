@@ -19,7 +19,7 @@ export async function getPresignedUrl(req:Request,res:Response){
             ContentType: "video/mp4", 
         });
         const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-        return res.status(200).json({url})
+        return res.status(200).json({url,key:fileKey})
     } 
 }
     catch (error) {

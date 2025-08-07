@@ -31,7 +31,6 @@ export async function createVideo(req:Request,res:Response){
                 connect:{id:userId}
             }
         }
-        
     })
     return res.status(201).json({message:"Video created successfully", videoData})
 } catch (error) {
