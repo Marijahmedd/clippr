@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticator } from "../controllers/controller";
 import { AuthenticatedRequest } from "../controllers/middleware";
-import { createVideo, deleteVideo, getVideo } from "../controllers/video.controller";
+import { createVideo, deleteVideo, getVideo, getVideoData } from "../controllers/video.controller";
 import { getPresignedUrl } from "../controllers/upload.controller";
 
 export const router = express.Router();
@@ -10,13 +10,15 @@ router.get("/",(_req,res)=>{
     res.send("hello from router")
 })
 
-router.get("/presigned-url",AuthenticatedRequest,getPresignedUrl)
+router.post("/presigned-url",AuthenticatedRequest,getPresignedUrl)
 
 
 
 
 router.post("/video",AuthenticatedRequest,createVideo)
 router.get("/video",AuthenticatedRequest,getVideo)
+router.get("/video/:id",getVideoData)
+
 router.delete("/video",AuthenticatedRequest,deleteVideo)
 
 
