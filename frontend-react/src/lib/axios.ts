@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { useVideoStore } from '@/stores/videoStore';
 
-// Create custom axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 // Request interceptor to automatically add auth token
