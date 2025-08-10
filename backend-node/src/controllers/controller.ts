@@ -24,35 +24,34 @@ export async function authenticator(req: Request, res: Response) {
     }
 
     type userData = {
-      email:string
+      email: string
       name: string
       image: string
     }
-    console.log(payload)
-    const userData:userData = {
+    const userData: userData = {
       email: payload.email,
       name: payload.name || "",
-      image : payload.picture || "",
+      image: payload.picture || "",
     }
     try {
       let user = await prisma.user.findUnique({
-        where:{
-          email:payload.email,
+        where: {
+          email: payload.email,
         }
       })
-      
-      if (!user){
-         user =  await prisma.user.create({
-          data:userData
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: userData
         })
       }
-      const token = jwt.sign({userId:user.id,email:payload.email},process.env.JWT_SECRET!,{expiresIn:"1d"})
-      return res.status(200).json({message:"Authenticated Successfully",token,userData})
+      const token = jwt.sign({ userId: user.id, email: payload.email }, process.env.JWT_SECRET!, { expiresIn: "1d" })
+      return res.status(200).json({ message: "Authenticated Successfully", token, userData })
 
     } catch (error) {
-      return res.status(400).json({message:"Error Signing in "})
+      return res.status(400).json({ message: "Error Signing in " })
     }
-    
+
   } catch (error) {
     console.error("Error verifying Google ID token:", error);
     return res.status(401).json({ error: "Invalid or expired Google token" });
