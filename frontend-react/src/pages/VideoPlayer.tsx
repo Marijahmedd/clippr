@@ -128,21 +128,22 @@ const VideoPlayer = () => {
     (!user.id && user.email && video.user?.email === user.email)
   );
 
+  const isUser = !!user
   // Check if user is logged in
-  const isLoggedIn = !!user;
 
   return (
     <div className="min-h-screen bg-background">
-      <TopNavigation isLoggedIn={isLoggedIn} />
+      <TopNavigation />
       <div className="max-w-5xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link to="/videos">
+          {isUser && (<Link to="/videos">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Videos
             </Button>
           </Link>
+          )}
 
           <div className="flex items-center gap-2">
             <Button

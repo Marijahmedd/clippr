@@ -5,17 +5,15 @@ import { useVideoStore } from '@/stores/videoStore';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
-interface TopNavigationProps {
-  isLoggedIn?: boolean; // Should be boolean, not just true
-}
 
-export const TopNavigation = ({ isLoggedIn }: TopNavigationProps) => {
+
+export const TopNavigation = () => {
   const { user, logout } = useVideoStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // Determine if user is actually logged in based on user data
-  const actuallyLoggedIn = isLoggedIn !== undefined ? isLoggedIn : !!user;
+  const isUser = !!user
 
   const handleLogout = () => {
     // Clear all React Query cache
@@ -47,7 +45,7 @@ export const TopNavigation = ({ isLoggedIn }: TopNavigationProps) => {
           </div>
 
           {/* User Info or Join Button */}
-          {actuallyLoggedIn && user ? (
+          {isUser && user ? (
             <div className="flex items-center gap-3">
               <Avatar className="w-8 h-8">
                 <AvatarImage src={user.image} />
