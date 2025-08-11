@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Search, VideoIcon, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useVideoStore } from '@/stores/videoStore';
 import { VideoCard } from '@/components/VideoCard';
-import { RecordModal } from '@/components/RecordModal';
 import UploadModal from '@/components/UploadModal';
 import { TopNavigation } from '@/components/TopNavigation';
 import { buildVideoUrl } from '@/lib/videoUtils';
 import api from '@/lib/axios';
 
+// Lazy load RecordModal to prevent mobile issues
+const RecordModal = lazy(() => import('@/components/RecordModal'));
 
 const Videos = () => {
   const {
@@ -19,6 +20,14 @@ const Videos = () => {
     setRecordModalOpen,
     setUploadModalOpen,
   } = useVideoStore();
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Simple mobile detection
+    const checkMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobile(checkMobile);
+  }, []);
 
   // Fetch videos with search
   const { data, isLoading, isFetching } = useQuery({
@@ -44,9 +53,7 @@ const Videos = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="bg-muted/60 border-b border-border">
-        <TopNavigation />
-      </div>
+      <TopNavigation />
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Controls Bar */}
@@ -63,13 +70,15 @@ const Videos = () => {
           </div>
           {/* Action Buttons - Right */}
           <div className="flex items-center gap-3">
-            <Button
-              onClick={() => setRecordModalOpen(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <VideoIcon className="w-4 h-4 mr-2" />
-              Record
-            </Button>
+            {!isMobile && (
+              <Button
+                onClick={() => setRecordModalOpen(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <VideoIcon className="w-4 h-4 mr-2" />
+                Record
+              </Button>
+            )}
             <Button
               onClick={() => setUploadModalOpen(true)}
               variant="secondary"
@@ -103,13 +112,16 @@ const Videos = () => {
                 : "Start creating amazing content"}
             </p>
             <div className="flex justify-center gap-3">
-
             </div>
           </div>
         )}
       </div>
 
-      <RecordModal />
+      {!isMobile && (
+        <Suspense fallback={null}>
+          <RecordModal />
+        </Suspense>
+      )}
       <UploadModal />
     </div>
   );

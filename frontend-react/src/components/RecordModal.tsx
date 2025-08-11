@@ -214,3 +214,5 @@ export const RecordModal = () => {
     </Dialog>
   );
 };
+
+export default RecordModal;

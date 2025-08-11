@@ -13,8 +13,6 @@ function GoogleAuth() {
     const queryClient = useQueryClient(); const responseMessage = async (credentials: any) => {
         try {
             const response = await api.post('/login/google', { credential: credentials.credential });
-            console.log('Login successful:', response.data);
-            console.log('User data from backend:', response.data.userData);
 
             // Clear any cached data from previous user
             queryClient.clear();
@@ -40,7 +38,6 @@ function GoogleAuth() {
     };
 
     const errorMessage = () => {
-        console.log("error while logging in");
         toast({
             title: "Login failed",
             description: "An error occurred while logging in with Google",

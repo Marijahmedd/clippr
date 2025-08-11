@@ -9,6 +9,7 @@ import { Upload, File, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { buildVideoUrl } from '@/lib/videoUtils';
 import api from '@/lib/axios';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 const UploadModal = () => {
   const { isUploadModalOpen, setUploadModalOpen, addVideo } = useVideoStore();
@@ -18,7 +19,7 @@ const UploadModal = () => {
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const queryClient = useQueryClient()
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -86,7 +87,7 @@ const UploadModal = () => {
       };
 
       addVideo(videoWithUrl);
-
+      queryClient.invalidateQueries({ queryKey: ['videos'] })
       toast({
         title: "Success!",
         description: "Your video has been uploaded successfully",

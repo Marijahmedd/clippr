@@ -31,7 +31,7 @@ export const TopNavigation = () => {
   };
 
   return (
-    <div className="border-b border-border/30 bg-card/50 backdrop-blur-sm">
+    <div className="border-b border-border/30 bg-card/50 backdrop-blur-sm bg-neutral-950">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Brand */}
