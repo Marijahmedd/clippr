@@ -45,7 +45,7 @@ export async function authenticator(req: Request, res: Response) {
           data: userData
         })
       }
-      const token = jwt.sign({ userId: user.id, email: payload.email }, process.env.JWT_SECRET!, { expiresIn: "1d" })
+      const token = jwt.sign({ userId: user.id, email: payload.email, name: payload.name }, process.env.JWT_SECRET!, { expiresIn: "1d" })
       return res.status(200).json({ message: "Authenticated Successfully", token, userData })
 
     } catch (error) {

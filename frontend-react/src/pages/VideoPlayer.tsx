@@ -1,15 +1,22 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { ArrowLeft, Share2, Download, Trash2 } from 'lucide-react';
+import { ArrowLeft, Share2, Download, Trash2, Link2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { buildVideoUrl } from '@/lib/videoUtils';
 import { useVideoStore } from '@/stores/videoStore';
 import { TopNavigation } from '@/components/TopNavigation';
 import api from '@/lib/axios';
+import { useState } from 'react';
 
 const VideoPlayer = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +24,8 @@ const VideoPlayer = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useVideoStore();
+  const [shareEmail, setShareEmail] = useState('');
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['video', id],
@@ -49,6 +58,32 @@ const VideoPlayer = () => {
       toast({
         title: "Delete failed",
         description: "Failed to delete video. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const shareMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await api.post('/video/share', {
+        videoId: id,
+        recepientMail: email,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Video shared!",
+        description: `Video link sent to ${shareEmail}`,
+      });
+      setShareEmail('');
+      setIsShareOpen(false);
+    },
+    onError: (error) => {
+      console.error('Share error:', error);
+      toast({
+        title: "Share failed",
+        description: "Failed to share video. Please try again.",
         variant: "destructive",
       });
     },
@@ -101,6 +136,30 @@ const VideoPlayer = () => {
     });
   };
 
+  const handleEmailShare = () => {
+    if (!shareEmail.trim()) {
+      toast({
+        title: "Email required",
+        description: "Please enter an email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(shareEmail)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    shareMutation.mutate(shareEmail);
+  };
+
   const handleDownload = () => {
     const link = document.createElement('a');
     link.href = video.url;
@@ -121,15 +180,12 @@ const VideoPlayer = () => {
     }
   };
 
-  // Check if current user owns this video
-  // Try ID first, fallback to email comparison if ID is missing
   const isVideoOwner = user && (
     (user.id && video.userId === user.id) ||
     (!user.id && user.email && video.user?.email === user.email)
   );
 
-  const isUser = !!user
-  // Check if user is logged in
+  const isUser = !!user;
 
   return (
     <div className="min-h-screen bg-background">
@@ -137,12 +193,13 @@ const VideoPlayer = () => {
       <div className="max-w-5xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          {isUser && (<Link to="/videos">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Videos
-            </Button>
-          </Link>
+          {isUser && (
+            <Link to="/videos">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Videos
+              </Button>
+            </Link>
           )}
 
           <div className="flex items-center gap-2">
@@ -152,8 +209,68 @@ const VideoPlayer = () => {
               size="sm"
               className="text-muted-foreground hover:text-foreground"
             >
-              <Share2 className="w-4 h-4" />
+              <Link2 className="w-4 h-4" />
             </Button>
+
+            {/* Email Share Button - Only for video owner */}
+            {isVideoOwner && (
+              <Popover open={isShareOpen} onOpenChange={setIsShareOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 bg-black border-gray-800" align="end">
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-white mb-2">Share Video</h3>
+                      <p className="text-sm text-gray-400 mb-3">
+                        Enter an email address to share this video directly
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Input
+                        type="email"
+                        placeholder="Enter email address..."
+                        value={shareEmail}
+                        onChange={(e) => setShareEmail(e.target.value)}
+                        className="bg-gray-900 border-gray-700 text-white placeholder:text-gray-500"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleEmailShare();
+                          }
+                        }}
+                      />
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => setIsShareOpen(false)}
+                          variant="ghost"
+                          size="sm"
+                          className="flex-1 text-gray-400 hover:text-white hover:bg-gray-800"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleEmailShare}
+                          size="sm"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          disabled={shareMutation.isPending}
+                        >
+                          {shareMutation.isPending ? 'Sending...' : 'Send'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+
             <Button
               onClick={handleDownload}
               variant="ghost"
@@ -162,11 +279,12 @@ const VideoPlayer = () => {
             >
               <Download className="w-4 h-4" />
             </Button>
+
             {/* Show delete button only if user owns the video */}
             {isVideoOwner && (
               <Button
                 onClick={handleDelete}
-                className='text-muted-foreground hover:text-red-700'
+                className="text-muted-foreground hover:text-red-700"
                 variant="ghost"
                 size="sm"
                 disabled={deleteMutation.isPending}

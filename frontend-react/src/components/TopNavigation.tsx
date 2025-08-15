@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-react';
 import { useVideoStore } from '@/stores/videoStore';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import Notification from './Notification';
 
 
 
@@ -12,7 +13,6 @@ export const TopNavigation = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Determine if user is actually logged in based on user data
   const isUser = !!user
 
   const handleLogout = () => {
@@ -46,25 +46,29 @@ export const TopNavigation = () => {
 
           {/* User Info or Join Button */}
           {isUser && user ? (
-            <div className="flex items-center gap-3">
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={user.image} />
-                <AvatarFallback>
-                  {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                {user.name || 'User'}
-              </span>
-              <Button
-                onClick={handleLogout}
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
+            <>
+              <Notification />
+
+              <div className="flex items-center gap-3">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={user.image} />
+                  <AvatarFallback>
+                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm text-muted-foreground hidden sm:block">
+                  {user.name || 'User'}
+                </span>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            </>
           ) : (
             <Button
               onClick={handleJoinClippr}

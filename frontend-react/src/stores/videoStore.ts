@@ -1,3 +1,4 @@
+import { socket } from '@/lib/socket';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -27,12 +28,12 @@ interface VideoStore {
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
-  
+
   // Videos
   videos: Video[];
   setVideos: (videos: Video[]) => void;
   addVideo: (video: Video) => void;
-  
+
   // UI State
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -50,31 +51,30 @@ export const useVideoStore = create<VideoStore>()(
       token: null,
       isAuthenticated: false,
       login: (user, token) => {
-        // Persist token for axios interceptor
         try {
           localStorage.setItem('token', token);
-        } catch {}
+        } catch { }
         set({ user, token, isAuthenticated: true });
       },
       logout: () => {
-        // Clear token from storage
         try {
           localStorage.removeItem('token');
-        } catch {}
-        set({ 
-          user: null, 
-          token: null, 
+          socket.disconnect()
+        } catch { }
+        set({
+          user: null,
+          token: null,
           isAuthenticated: false,
           videos: [], // Clear videos on logout
           searchQuery: '' // Clear search query too
         });
       },
-      
+
       // Videos
       videos: [],
       setVideos: (videos) => set({ videos }),
       addVideo: (video) => set((state) => ({ videos: [video, ...state.videos] })),
-      
+
       // UI State
       searchQuery: '',
       setSearchQuery: (searchQuery) => set({ searchQuery }),
@@ -85,10 +85,10 @@ export const useVideoStore = create<VideoStore>()(
     }),
     {
       name: 'clippr-storage',
-      partialize: (state) => ({ 
-        user: state.user, 
+      partialize: (state) => ({
+        user: state.user,
         token: state.token,
-        isAuthenticated: state.isAuthenticated 
+        isAuthenticated: state.isAuthenticated
       }),
     }
   )

@@ -8,6 +8,7 @@ declare global {
       user?: {
         id: string;
         email: string;
+        name: string;
       };
     }
   }
@@ -26,16 +27,18 @@ export async function AuthenticatedRequest(req: Request, res: Response, next: Ne
 
   type JWTPayload = {
     userId: string,
-    email: string
+    email: string,
+    name: string
   }
 
   try {
     const decoded = jwt.verify(token, secretKey)
 
-    const { userId, email } = decoded as JWTPayload
+    const { userId, email, name } = decoded as JWTPayload
     req.user = {
       id: userId,
-      email
+      email,
+      name
     }
     next()
   } catch (jwtError) {
