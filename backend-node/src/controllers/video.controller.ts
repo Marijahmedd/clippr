@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/db";
+import { io } from "../app";
 
 export async function createVideo(req: Request, res: Response) {
     type VideoRequest = {
@@ -123,3 +124,7 @@ export async function deleteVideo(req: Request, res: Response) {
     }
 
 }
+
+
+
+

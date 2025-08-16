@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { VideoIcon, Zap, Shield, Globe } from 'lucide-react';
+import { Zap, Shield, Globe } from 'lucide-react';
 import { useVideoStore } from '@/stores/videoStore';
 import GoogleAuth from '@/components/GoogleAuth';
 import { useEffect } from 'react';
@@ -12,15 +12,24 @@ const Index = () => {
 
   const words = ["RECORD", "UPLOAD", "SHARE"];
 
-  // Redirect to videos if already authenticated
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/videos');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   return (
-    <div className="h-screen w-full rounded-md flex md:items-center md:justify-center bg-black/[0.96] antialiased relative overflow-hidden">
+    <div
+      className="
+        min-h-screen  
+        w-full rounded-md flex md:items-center md:justify-center
+        bg-black/[0.96] antialiased relative
+        overflow-x-hidden  
+        overflow-y-auto    
+        md:overflow-hidden 
+      "
+    >
       <SpotlightNew />
       <div className="p-4 max-w-7xl mx-auto relative z-10 w-full pt-20 md:pt-0">
         {/* Hero Section */}
