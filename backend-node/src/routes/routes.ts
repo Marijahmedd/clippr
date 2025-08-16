@@ -2,7 +2,7 @@ import express from "express";
 import { authenticator } from "../controllers/controller";
 import { AuthenticatedRequest } from "../controllers/middleware";
 import { createVideo, deleteVideo, getVideo, getVideoData } from "../controllers/video.controller";
-import { getNotifications, shareVideo } from "../controllers/notifications.controller";
+import { getNotifications, markAsRead, shareVideo } from "../controllers/notifications.controller";
 import { getPresignedUrl } from "../controllers/upload.controller";
 
 export const router = express.Router();
@@ -23,6 +23,8 @@ router.get("/video/:id", getVideoData)
 router.delete("/video", AuthenticatedRequest, deleteVideo)
 
 router.get("/me/notifications", AuthenticatedRequest, getNotifications)
+router.patch("/me/notifications", AuthenticatedRequest, markAsRead)
+
 router.post("/video/share", AuthenticatedRequest, shareVideo)
 
 

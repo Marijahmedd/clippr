@@ -52,6 +52,7 @@ model Notification {
   senderId String
   video Video @relation(fields: [videoId],references: [id])
   videoId String
+  isRead Boolean @default(false)
   createdAt DateTime @default(now())
 
   @@index(fields : [recepientId])

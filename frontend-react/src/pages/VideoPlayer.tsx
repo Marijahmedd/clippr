@@ -17,6 +17,7 @@ import { useVideoStore } from '@/stores/videoStore';
 import { TopNavigation } from '@/components/TopNavigation';
 import api from '@/lib/axios';
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 
 const VideoPlayer = () => {
   const { id } = useParams<{ id: string }>();
@@ -80,12 +81,19 @@ const VideoPlayer = () => {
       setIsShareOpen(false);
     },
     onError: (error) => {
-      console.error('Share error:', error);
-      toast({
-        title: "Share failed",
-        description: "Failed to share video. Please try again.",
-        variant: "destructive",
-      });
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Share failed",
+          description: error.response.data.error || "Something went wrong",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Share failed",
+          description: "Unexpected error occurred",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -216,10 +224,11 @@ const VideoPlayer = () => {
             {isVideoOwner && (
               <Popover open={isShareOpen} onOpenChange={setIsShareOpen}>
                 <PopoverTrigger asChild>
+
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground "
                   >
                     <Send className="w-4 h-4" />
                   </Button>
@@ -250,6 +259,8 @@ const VideoPlayer = () => {
                       <div className="flex gap-2">
                         <Button
                           onClick={() => setIsShareOpen(false)}
+                          disabled={shareMutation.isPending}
+
                           variant="ghost"
                           size="sm"
                           className="flex-1 text-gray-400 hover:text-white hover:bg-gray-800"

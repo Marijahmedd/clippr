@@ -67,6 +67,7 @@ export async function shareVideo(req: Request, res: Response) {
         const notification = {
             id: newNotification.id,
             senderId,
+            videoId: videoId,
             senderName,
             videoTitle: videoData.title,
             createdAt: newNotification.createdAt
@@ -81,6 +82,10 @@ export async function shareVideo(req: Request, res: Response) {
 }
 
 
+
+
+
+
 export async function getNotifications(req: Request, res: Response) {
     const userId = req.user?.id
     if (!userId) {
@@ -92,34 +97,77 @@ export async function getNotifications(req: Request, res: Response) {
             where: {
                 recepientId: userId
             },
-
             select: {
                 id: true,
+
                 createdAt: true,
                 sender: {
                     select: {
                         name: true
-
                     }
                 },
                 video: {
-
                     select: {
                         title: true,
                         id: true
                     }
-
                 }
-
             },
             orderBy: {
                 createdAt: "desc"
             }
         })
+
+        // get read notification status.
+
+        const isNewNotification = Boolean(await prisma.notification.findFirst({
+            where: {
+                AND: [{
+                    isRead: false,
+
+                },
+                {
+                    recepientId: userId
+                }]
+
+            }
+        }))
+
         return res.status(200).json({
-            notifications
+            notifications, isNewNotification
         })
+
+
     } catch (error) {
         return res.status(500).json({ error: "Error fetching notifications" })
     }
 }
+
+
+export async function markAsRead(req: Request, res: Response) {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const result = await prisma.notification.updateMany({
+            where: {
+                recepientId: userId,
+                isRead: false,
+            },
+            data: {
+                isRead: true,
+            },
+        });
+
+        return res.json({
+            success: true,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Something went wrong" });
+    }
+}
+
+

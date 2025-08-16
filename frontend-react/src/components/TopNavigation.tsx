@@ -47,9 +47,9 @@ export const TopNavigation = () => {
           {/* User Info or Join Button */}
           {isUser && user ? (
             <>
-              <Notification />
 
               <div className="flex items-center gap-3">
+                <Notification />
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.image} />
                   <AvatarFallback>
