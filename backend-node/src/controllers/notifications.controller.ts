@@ -75,8 +75,8 @@ export async function shareVideo(req: Request, res: Response) {
 
         io.to(recepient.id).emit("newNotification", notification)
         return res.status(200).json({ message: "Video Shared" })
-    } catch {
-        return res.status(500).json({ error: "Error sharing video" })
+    } catch (error) {
+        return res.status(500).json({ error: "Error sharing video", errorCode: error })
 
     }
 }
@@ -139,7 +139,7 @@ export async function getNotifications(req: Request, res: Response) {
 
 
     } catch (error) {
-        return res.status(500).json({ error: "Error fetching notifications" })
+        return res.status(500).json({ error: "Error fetching notifications", errorCode: error })
     }
 }
 

@@ -62,6 +62,14 @@ const Notification = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token')
+        if (!token) {
+            console.log('token not found for ws')
+
+        }
+        else {
+            console.log('SUCCES,token found for ws')
+
+        }
         if (!user || !token) {
             updateSocketAuth(null)
             socket.disconnect()
