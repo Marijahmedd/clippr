@@ -45,7 +45,7 @@ interface VideoStore {
 
 export const useVideoStore = create<VideoStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Auth
       user: null,
       token: null,

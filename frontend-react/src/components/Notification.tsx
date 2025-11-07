@@ -46,8 +46,18 @@ const Notification = () => {
     useEffect(() => {
         if (notificationData) {
             setNewNotif(notificationData.isNewNotification)
-
-            const transformedNotifications = notificationData.notifications.map(notif => ({
+            type Notif = {
+                id: string,
+                createdAt: string,
+                sender: {
+                    name: string,
+                }
+                video: {
+                    id: string,
+                    title: string
+                }
+            }
+            const transformedNotifications = notificationData.notifications.map((notif: Notif) => ({
                 id: notif.id,
                 senderName: notif.sender?.name || 'Unknown User',
                 videoTitle: notif.video?.title || 'Untitled Video',

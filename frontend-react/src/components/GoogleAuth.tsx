@@ -10,7 +10,8 @@ function GoogleAuth() {
     const { login } = useVideoStore();
     const { toast } = useToast();
     const navigate = useNavigate();
-    const queryClient = useQueryClient(); const responseMessage = async (credentials: any) => {
+    const queryClient = useQueryClient();
+    const responseMessage = async (credentials: any) => {
         try {
             const response = await api.post('/login/google', { credential: credentials.credential });
 

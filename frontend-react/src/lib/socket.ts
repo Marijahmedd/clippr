@@ -7,4 +7,4 @@ export const socket = io(import.meta.env.VITE_WS_BASE_URL, {
 
 export const updateSocketAuth = (token: string | null) => {
     socket.auth = { token };
-};
+};  
